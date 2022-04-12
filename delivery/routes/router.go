@@ -2,6 +2,7 @@ package routes
 
 import (
 	_authHandler "group-project/dolan-planner/delivery/handler/auth"
+	_catagoryHandler "group-project/dolan-planner/delivery/handler/catagory"
 	_eventHandler "group-project/dolan-planner/delivery/handler/event"
 	_userHandler "group-project/dolan-planner/delivery/handler/user"
 	_middlewares "group-project/dolan-planner/delivery/middlewares"
@@ -26,4 +27,8 @@ func RegisterEventPath(e *echo.Echo, eh *_eventHandler.EventHandler) {
 	e.GET("/events/:id", eh.GetEventByIdHandler())
 	e.PUT("/events/:id", eh.UpdateEventHandler(), _middlewares.JWTMiddleware())
 	e.DELETE("/events/:id", eh.DeleteEventHandler(), _middlewares.JWTMiddleware())
+}
+
+func RegisterCatagoryPath(e *echo.Echo, uh *_catagoryHandler.CatagoryHandler) {
+	e.GET("/catagories", uh.GetAllCatagoryHandler())
 }
