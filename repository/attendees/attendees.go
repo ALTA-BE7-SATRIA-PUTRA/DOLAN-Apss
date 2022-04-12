@@ -55,7 +55,7 @@ func (ur *AttendeesRepository) PostAttendees(idEvent uint, idToken uint) (_entit
 
 func (ur *AttendeesRepository) GetAttendees(idEvent uint) ([]_entities.Attendees, error) {
 	var attendees []_entities.Attendees
-	tx := ur.database.Where("event_id = ?", idEvent).Find(&attendees)
+	tx := ur.database.Preload("User").Where("event_id = ?", idEvent).Find(&attendees)
 
 	if tx.Error != nil {
 		return nil, tx.Error
