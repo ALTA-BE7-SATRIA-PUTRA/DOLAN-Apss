@@ -21,6 +21,10 @@ import (
 	_eventRepository "group-project/dolan-planner/repository/event"
 	_eventUseCase "group-project/dolan-planner/usecase/event"
 
+	_catagoryHandler "group-project/dolan-planner/delivery/handler/catagory"
+	_catagoryRepository "group-project/dolan-planner/repository/catagory"
+	_catagoryUseCase "group-project/dolan-planner/usecase/catagory"
+
 	_routes "group-project/dolan-planner/delivery/routes"
 	_utils "group-project/dolan-planner/utils"
 )
@@ -41,6 +45,10 @@ func main() {
 	eventUseCase := _eventUseCase.NewEventUseCase(eventRepo, userRepo)
 	eventHandler := _eventHandler.NewEventHandler(eventUseCase)
 
+	catagoryRepo := _catagoryRepository.NewCatagoryRepository(db)
+	catagoryUseCase := _catagoryUseCase.NewCatagoryUseCase(catagoryRepo)
+	catagoryHandler := _catagoryHandler.NewCatagoryHandler(catagoryUseCase)
+
 	e := echo.New()
 	e.Use(middleware.CORS())
 	e.Pre(middleware.RemoveTrailingSlash())
@@ -52,6 +60,7 @@ func main() {
 	_routes.RegisterAuthPath(e, authHandler)
 	_routes.RegisterUserPath(e, userHandler)
 	_routes.RegisterEventPath(e, eventHandler)
+	_routes.RegisterCatagoryPath(e, &catagoryHandler)
 
 	log.Fatal(e.Start(fmt.Sprintf(":%v", config.Port)))
 }
