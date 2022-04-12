@@ -18,15 +18,19 @@ import (
 	_userUseCase "group-project/dolan-planner/usecase/user"
 
 	_attendeesHandler "group-project/dolan-planner/delivery/handler/attendees"
-	_attendeesRepository "group-project/dolan-planner/repository/attendees"
-	_attendeesUseCase "group-project/dolan-planner/usecase/attendees"
 	_eventHandler "group-project/dolan-planner/delivery/handler/event"
+	_attendeesRepository "group-project/dolan-planner/repository/attendees"
 	_eventRepository "group-project/dolan-planner/repository/event"
+	_attendeesUseCase "group-project/dolan-planner/usecase/attendees"
 	_eventUseCase "group-project/dolan-planner/usecase/event"
 
 	_catagoryHandler "group-project/dolan-planner/delivery/handler/catagory"
 	_catagoryRepository "group-project/dolan-planner/repository/catagory"
 	_catagoryUseCase "group-project/dolan-planner/usecase/catagory"
+
+	_commentHandler "group-project/dolan-planner/delivery/handler/comment"
+	_commentRepository "group-project/dolan-planner/repository/comment"
+	_commentUseCase "group-project/dolan-planner/usecase/comment"
 
 	_routes "group-project/dolan-planner/delivery/routes"
 	_utils "group-project/dolan-planner/utils"
@@ -56,6 +60,10 @@ func main() {
 	catagoryUseCase := _catagoryUseCase.NewCatagoryUseCase(catagoryRepo)
 	catagoryHandler := _catagoryHandler.NewCatagoryHandler(catagoryUseCase)
 
+	commentRepo := _commentRepository.NewCommentRepository(db)
+	commentUseCase := _commentUseCase.NewCommentUseCase(commentRepo)
+	commentHandler := _commentHandler.NewCommentHandler(commentUseCase)
+
 	e := echo.New()
 	e.Use(middleware.CORS())
 	e.Pre(middleware.RemoveTrailingSlash())
@@ -65,6 +73,7 @@ func main() {
 	}))
 
 	_routes.RegisterAuthPath(e, authHandler)
+	_routes.RegisterCommentPath(e, commentHandler)
 	_routes.RegisterUserPath(e, userHandler)
 	_routes.RegisterAttendeesPath(e, attendeesHandler)
 	_routes.RegisterEventPath(e, eventHandler)

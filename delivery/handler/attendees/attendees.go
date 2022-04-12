@@ -48,7 +48,7 @@ func (uh *AttendeesHandler) PostAttendeesHandler() echo.HandlerFunc {
 		}
 
 		if idErr == 4 {
-			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("fail to read attesndees"))
+			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("fail to read attendees"))
 		}
 
 		return c.JSON(http.StatusOK, helper.ResponseSuccessWithoutData("succses join to event"))
@@ -71,9 +71,9 @@ func (uh *AttendeesHandler) GetAttendeesHandler() echo.HandlerFunc {
 
 		attendees, err := uh.attendeesUseCase.GetAttendees(uint(idEvent))
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("fail to get attesndees"))
+			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("fail to get attendees"))
 		}
 
-		return c.JSON(http.StatusOK, helper.ResponseSuccess("succses to get attemdes", attendees))
+		return c.JSON(http.StatusOK, helper.ResponseSuccess("succses to get attendees", attendees))
 	}
 }
