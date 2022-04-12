@@ -6,6 +6,7 @@ import (
 	"group-project/dolan-planner/entities"
 	_eventUseCase "group-project/dolan-planner/usecase/event"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -62,5 +63,64 @@ func (eh *EventHandler) GetAllEventHandler() echo.HandlerFunc {
 		}
 
 		return c.JSON(http.StatusOK, helper.ResponseSuccess("success get all events", responseEvents))
+	}
+}
+
+func (eh *EventHandler) GetEventByIdHandler() echo.HandlerFunc {
+
+	return func(c echo.Context) error {
+
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("id not recognise"))
+		}
+
+		event, rows, err := eh.eventUseCase.GetEventById(id)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed(err.Error()))
+		}
+		if rows == 0 {
+			return c.JSON(http.StatusBadRequest, helper.ResponseFailed("data not found"))
+		}
+
+		attendees := []map[string]interface{}{}
+		for i := 0; i < len(event.Attendees); i++ {
+			response := map[string]interface{}{
+				"id": event.Attendees[i].ID,
+				"user": map[string]interface{}{
+					"name":      event.Attendees[i].User.Name,
+					"url_image": event.Attendees[i].User.UrlImage},
+			}
+			attendees = append(attendees, response)
+		}
+
+		comment := []map[string]interface{}{}
+		for i := 0; i < len(event.Comment); i++ {
+			response := map[string]interface{}{
+				"id":         event.Comment[i].ID,
+				"created_at": event.Comment[i].CreatedAt,
+				"comment":    event.Comment[i].Comment,
+				"user": map[string]interface{}{
+					"name": event.Comment[i].User.Name},
+			}
+			comment = append(comment, response)
+		}
+
+		responseEvent := map[string]interface{}{
+			"id":                 event.ID,
+			"catagory_id":        event.ID,
+			"name_event":         event.NameEvent,
+			"hosted_by":          event.HostedBy,
+			"max_participants":   event.MaxParticipants,
+			"total_participants": event.TotalParticipants,
+			"date":               event.Date,
+			"location":           event.Location,
+			"detail_event":       event.DetailEvent,
+			"url_image":          event.UrlImage,
+			"attendees":          attendees,
+			"comment":            comment,
+		}
+
+		return c.JSON(http.StatusOK, helper.ResponseSuccess("success get event by id", responseEvent))
 	}
 }

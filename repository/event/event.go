@@ -32,3 +32,15 @@ func (er *EventRepository) GetAllEvent() ([]_entities.Event, error) {
 	}
 	return events, nil
 }
+
+func (er *EventRepository) GetEventById(id int) (_entities.Event, int, error) {
+	var event _entities.Event
+	tx := er.database.Preload("Attendees.User").Preload("Comment.User").Find(&event, id)
+	if tx.Error != nil {
+		return event, 0, tx.Error
+	}
+	if tx.RowsAffected == 0 {
+		return event, 0, nil
+	}
+	return event, int(tx.RowsAffected), nil
+}

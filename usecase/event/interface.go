@@ -7,4 +7,5 @@ import (
 type EventUseCaseInterface interface {
 	CreatEvent(newEvent _entities.Event, idToken uint) (_entities.Event, error)
 	GetAllEvent() ([]_entities.Event, error)
+	GetEventById(id int) (_entities.Event, int, error)
 }

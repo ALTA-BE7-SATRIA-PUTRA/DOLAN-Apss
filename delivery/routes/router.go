@@ -23,4 +23,5 @@ func RegisterUserPath(e *echo.Echo, uh *_userHandler.UserHandler) {
 func RegisterEventPath(e *echo.Echo, eh *_eventHandler.EventHandler) {
 	e.POST("/events", eh.CreateEventHandler(), _middlewares.JWTMiddleware())
 	e.GET("/events", eh.GetAllEventHandler())
+	e.GET("/events/:id", eh.GetEventByIdHandler())
 }

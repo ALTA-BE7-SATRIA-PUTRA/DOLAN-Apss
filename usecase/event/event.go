@@ -58,3 +58,8 @@ func (euc *EventUseCase) GetAllEvent() ([]_entities.Event, error) {
 	events, err := euc.eventRepository.GetAllEvent()
 	return events, err
 }
+
+func (euc *EventUseCase) GetEventById(id int) (_entities.Event, int, error) {
+	event, rows, err := euc.eventRepository.GetEventById(id)
+	return event, rows, err
+}
