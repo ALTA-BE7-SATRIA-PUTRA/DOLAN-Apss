@@ -41,3 +41,26 @@ func (eh *EventHandler) CreateEventHandler() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, helper.ResponseSuccessWithoutData("success create event"))
 	}
 }
+
+func (eh *EventHandler) GetAllEventHandler() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		events, err := eh.eventUseCase.GetAllEvent()
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to fetch data"))
+		}
+
+		responseEvents := []map[string]interface{}{}
+		for i := 0; i < len(events); i++ {
+			response := map[string]interface{}{
+				"id":         events[i].ID,
+				"name_event": events[i].NameEvent,
+				"date":       events[i].Date,
+				"hosted_by":  events[i].HostedBy,
+				"location":   events[i].Location,
+			}
+			responseEvents = append(responseEvents, response)
+		}
+
+		return c.JSON(http.StatusOK, helper.ResponseSuccess("success get all events", responseEvents))
+	}
+}

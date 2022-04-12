@@ -53,3 +53,8 @@ func (euc *EventUseCase) CreatEvent(newEvent _entities.Event, idToken uint) (_en
 
 	return createEvent, err
 }
+
+func (euc *EventUseCase) GetAllEvent() ([]_entities.Event, error) {
+	events, err := euc.eventRepository.GetAllEvent()
+	return events, err
+}

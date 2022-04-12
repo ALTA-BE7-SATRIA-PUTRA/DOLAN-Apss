@@ -23,3 +23,12 @@ func (er *EventRepository) CreatEvent(newEvent _entities.Event) (_entities.Event
 	}
 	return newEvent, nil
 }
+
+func (er *EventRepository) GetAllEvent() ([]_entities.Event, error) {
+	var events []_entities.Event
+	tx := er.database.Find(&events)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return events, nil
+}
