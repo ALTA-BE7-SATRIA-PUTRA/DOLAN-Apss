@@ -13,6 +13,10 @@ import (
 	_authRepository "group-project/dolan-planner/repository/auth"
 	_authUseCase "group-project/dolan-planner/usecase/auth"
 
+	_userHandler "group-project/dolan-planner/delivery/handler/user"
+	_userRepository "group-project/dolan-planner/repository/user"
+	_userUseCase "group-project/dolan-planner/usecase/user"
+
 	_routes "group-project/dolan-planner/delivery/routes"
 	_utils "group-project/dolan-planner/utils"
 )
@@ -25,6 +29,10 @@ func main() {
 	authUseCase := _authUseCase.NewAuthUseCase(authRepo)
 	authHandler := _authHandler.NewAuthHandler(authUseCase)
 
+	userRepo := _userRepository.NewUserRepository(db)
+	userUseCase := _userUseCase.NewUserUseCase(userRepo)
+	userHandler := _userHandler.NewUserHandler(userUseCase)
+
 	e := echo.New()
 	e.Use(middleware.CORS())
 	e.Pre(middleware.RemoveTrailingSlash())
@@ -34,6 +42,7 @@ func main() {
 	}))
 
 	_routes.RegisterAuthPath(e, authHandler)
+	_routes.RegisterUserPath(e, userHandler)
 
 	log.Fatal(e.Start(fmt.Sprintf(":%v", config.Port)))
 }
