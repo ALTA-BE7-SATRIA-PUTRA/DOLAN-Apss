@@ -1,6 +1,7 @@
 package routes
 
 import (
+	_attendeesHandler "group-project/dolan-planner/delivery/handler/attendees"
 	_authHandler "group-project/dolan-planner/delivery/handler/auth"
 	_catagoryHandler "group-project/dolan-planner/delivery/handler/catagory"
 	_eventHandler "group-project/dolan-planner/delivery/handler/event"
@@ -20,7 +21,10 @@ func RegisterUserPath(e *echo.Echo, uh *_userHandler.UserHandler) {
 	e.PUT("/users/:id", uh.UpdateUserHandler(), _middlewares.JWTMiddleware())
 	e.DELETE("/users/:id", uh.DeleteUserHandler(), _middlewares.JWTMiddleware())
 }
-
+func RegisterAttendeesPath(e *echo.Echo, ah *_attendeesHandler.AttendeesHandler) {
+	e.POST("/attendees/:id", ah.PostAttendeesHandler(), _middlewares.JWTMiddleware())
+	e.GET("/attendees/:id", ah.GetAttendeesHandler(), _middlewares.JWTMiddleware())
+  
 func RegisterEventPath(e *echo.Echo, eh *_eventHandler.EventHandler) {
 	e.POST("/events", eh.CreateEventHandler(), _middlewares.JWTMiddleware())
 	e.GET("/events", eh.GetAllEventHandler())

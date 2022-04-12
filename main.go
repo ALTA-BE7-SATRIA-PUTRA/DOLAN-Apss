@@ -17,6 +17,9 @@ import (
 	_userRepository "group-project/dolan-planner/repository/user"
 	_userUseCase "group-project/dolan-planner/usecase/user"
 
+	_attendeesHandler "group-project/dolan-planner/delivery/handler/attendees"
+	_attendeesRepository "group-project/dolan-planner/repository/attendees"
+	_attendeesUseCase "group-project/dolan-planner/usecase/attendees"
 	_eventHandler "group-project/dolan-planner/delivery/handler/event"
 	_eventRepository "group-project/dolan-planner/repository/event"
 	_eventUseCase "group-project/dolan-planner/usecase/event"
@@ -41,6 +44,10 @@ func main() {
 	userUseCase := _userUseCase.NewUserUseCase(userRepo)
 	userHandler := _userHandler.NewUserHandler(userUseCase)
 
+	attendeesRepo := _attendeesRepository.NewAttendeesRepository(db)
+	attendeesUseCase := _attendeesUseCase.NewAttendeesUseCase(attendeesRepo)
+	attendeesHandler := _attendeesHandler.NewAttendeesHandler(attendeesUseCase)
+
 	eventRepo := _eventRepository.NewEventRepository(db)
 	eventUseCase := _eventUseCase.NewEventUseCase(eventRepo, userRepo)
 	eventHandler := _eventHandler.NewEventHandler(eventUseCase)
@@ -59,6 +66,7 @@ func main() {
 
 	_routes.RegisterAuthPath(e, authHandler)
 	_routes.RegisterUserPath(e, userHandler)
+	_routes.RegisterAttendeesPath(e, attendeesHandler)
 	_routes.RegisterEventPath(e, eventHandler)
 	_routes.RegisterCatagoryPath(e, &catagoryHandler)
 

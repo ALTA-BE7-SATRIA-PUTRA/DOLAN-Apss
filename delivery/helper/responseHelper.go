@@ -1,6 +1,8 @@
 package helper
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"golang.org/x/crypto/bcrypt"
+)
 
 func ResponseSuccess(message string, data interface{}) map[string]interface{} {
 	return map[string]interface{}{
