@@ -17,7 +17,7 @@ type Event struct {
 	Date              time.Time   `gorm:"not null" json:"date" form:"date"`
 	Location          string      `gorm:"not null" json:"location" form:"location"`
 	DetailEvent       string      `gorm:"not null" json:"detail_event" form:"detail_event"`
-	UrlImage          string      `gorm:"not null" form:"url_image"`
+	UrlImage          string      `gorm:"not null" json:"url_image" form:"url_image"`
 	Attendees         []Attendees `gorm:"foreignKey:EventId;references:ID"`
 	Comment           []Comment   `gorm:"foreignKey:EventId;references:ID"`
 }
