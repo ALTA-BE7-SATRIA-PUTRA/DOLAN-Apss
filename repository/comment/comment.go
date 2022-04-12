@@ -38,7 +38,7 @@ func (ur *CommentRepository) PostComment(comment _entities.Comment, idEvent uint
 func (ur *CommentRepository) GetComment(idEvent uint) ([]_entities.Comment, error) {
 	var comment []_entities.Comment
 
-	tx := ur.database.Where("event_id = ?", idEvent).Find(&comment)
+	tx := ur.database.Preload("User").Where("event_id = ?", idEvent).Find(&comment)
 
 	if tx.Error != nil {
 		return nil, tx.Error

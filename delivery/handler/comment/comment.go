@@ -74,6 +74,20 @@ func (uh *CommentHandler) GetCommentHandler() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("fail to get comment"))
 		}
 
-		return c.JSON(http.StatusOK, helper.ResponseSuccess("succses to get comment", comment))
+		responseComment := []map[string]interface{}{}
+		for i := 0; i < len(comment); i++ {
+			response := map[string]interface{}{
+				"id":         comment[i].ID,
+				"created_at": comment[i].CreatedAt,
+				"event_id":   comment[i].EventId,
+				"user_id":    comment[i].UserId,
+				"comment":    comment[i].Comment,
+				"user": map[string]interface{}{
+					"name": comment[i].User.Name},
+			}
+			responseComment = append(responseComment, response)
+		}
+
+		return c.JSON(http.StatusOK, helper.ResponseSuccess("succses to get comment", responseComment))
 	}
 }

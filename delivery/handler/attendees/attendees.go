@@ -74,6 +74,19 @@ func (uh *AttendeesHandler) GetAttendeesHandler() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("fail to get attendees"))
 		}
 
-		return c.JSON(http.StatusOK, helper.ResponseSuccess("succses to get attendees", attendees))
+		responseAttendees := []map[string]interface{}{}
+		for i := 0; i < len(attendees); i++ {
+			response := map[string]interface{}{
+				"id":       attendees[i].ID,
+				"event_id": attendees[i].EventId,
+				"user_id":  attendees[i].UserId,
+				"user": map[string]interface{}{
+					"name":      attendees[i].User.Name,
+					"url_image": attendees[i].User.UrlImage},
+			}
+			responseAttendees = append(responseAttendees, response)
+		}
+
+		return c.JSON(http.StatusOK, helper.ResponseSuccess("succses to get attendees", responseAttendees))
 	}
 }
