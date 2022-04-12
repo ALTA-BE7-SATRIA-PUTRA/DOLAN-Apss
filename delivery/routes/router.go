@@ -4,6 +4,7 @@ import (
 	_attendeesHandler "group-project/dolan-planner/delivery/handler/attendees"
 	_authHandler "group-project/dolan-planner/delivery/handler/auth"
 	_catagoryHandler "group-project/dolan-planner/delivery/handler/catagory"
+	_commentHandler "group-project/dolan-planner/delivery/handler/comment"
 	_eventHandler "group-project/dolan-planner/delivery/handler/event"
 	_userHandler "group-project/dolan-planner/delivery/handler/user"
 	_middlewares "group-project/dolan-planner/delivery/middlewares"
@@ -24,6 +25,7 @@ func RegisterUserPath(e *echo.Echo, uh *_userHandler.UserHandler) {
 func RegisterAttendeesPath(e *echo.Echo, ah *_attendeesHandler.AttendeesHandler) {
 	e.POST("/attendees/:id", ah.PostAttendeesHandler(), _middlewares.JWTMiddleware())
 	e.GET("/attendees/:id", ah.GetAttendeesHandler(), _middlewares.JWTMiddleware())
+
 }
 func RegisterEventPath(e *echo.Echo, eh *_eventHandler.EventHandler) {
 	e.POST("/events", eh.CreateEventHandler(), _middlewares.JWTMiddleware())
@@ -35,4 +37,8 @@ func RegisterEventPath(e *echo.Echo, eh *_eventHandler.EventHandler) {
 
 func RegisterCatagoryPath(e *echo.Echo, uh *_catagoryHandler.CatagoryHandler) {
 	e.GET("/catagories", uh.GetAllCatagoryHandler())
+}
+func RegisterCommentPath(e *echo.Echo, ch *_commentHandler.CommentHandler) {
+	e.POST("/comment/:id", ch.PostCommentHandler(), _middlewares.JWTMiddleware())
+	e.GET("/comment/:id", ch.GetCommentHandler(), _middlewares.JWTMiddleware())
 }
