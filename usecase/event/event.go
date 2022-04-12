@@ -50,6 +50,9 @@ func (euc *EventUseCase) CreatEvent(newEvent _entities.Event, idToken uint) (_en
 	if newEvent.UrlImage == "" {
 		return newEvent, errors.New("url_image can't be empty")
 	}
+	if newEvent.Date.IsZero() {
+		return newEvent, errors.New("date can't be empty")
+	}
 
 	return createEvent, err
 }
@@ -62,4 +65,46 @@ func (euc *EventUseCase) GetAllEvent() ([]_entities.Event, error) {
 func (euc *EventUseCase) GetEventById(id int) (_entities.Event, int, error) {
 	event, rows, err := euc.eventRepository.GetEventById(id)
 	return event, rows, err
+}
+
+func (euc *EventUseCase) UpdateEvent(updateEvent _entities.Event, id int, idToken int) (_entities.Event, int, error) {
+	eventFind, rows, err := euc.eventRepository.GetEventById(id)
+	if err != nil {
+		return eventFind, 0, err
+	}
+	if rows == 0 {
+		return eventFind, 0, nil
+	}
+	if eventFind.UserId != uint(idToken) {
+		return eventFind, 1, errors.New("unauthorized")
+	}
+	if updateEvent.CatagoryId != 0 {
+		eventFind.CatagoryId = updateEvent.CatagoryId
+	}
+	if updateEvent.NameEvent != "" {
+		eventFind.NameEvent = updateEvent.NameEvent
+	}
+	if updateEvent.MaxParticipants != 0 {
+		eventFind.MaxParticipants = updateEvent.MaxParticipants
+	}
+	if updateEvent.Date.IsZero() {
+		eventFind.Date = updateEvent.Date
+	}
+	if updateEvent.Location != "" {
+		eventFind.Location = updateEvent.Location
+	}
+	if updateEvent.DetailEvent != "" {
+		eventFind.DetailEvent = updateEvent.DetailEvent
+	}
+	if updateEvent.UrlImage != "" {
+		eventFind.UrlImage = updateEvent.UrlImage
+	}
+
+	event, rows, err := euc.eventRepository.UpdateEvent(eventFind)
+	return event, rows, err
+}
+
+func (euc *EventUseCase) DeleteEvent(id int) (int, error) {
+	rows, err := euc.eventRepository.DeleteEvent(id)
+	return rows, err
 }

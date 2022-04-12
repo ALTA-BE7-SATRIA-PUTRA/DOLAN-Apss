@@ -24,4 +24,6 @@ func RegisterEventPath(e *echo.Echo, eh *_eventHandler.EventHandler) {
 	e.POST("/events", eh.CreateEventHandler(), _middlewares.JWTMiddleware())
 	e.GET("/events", eh.GetAllEventHandler())
 	e.GET("/events/:id", eh.GetEventByIdHandler())
+	e.PUT("/events/:id", eh.UpdateEventHandler(), _middlewares.JWTMiddleware())
+	e.DELETE("/events/:id", eh.DeleteEventHandler(), _middlewares.JWTMiddleware())
 }

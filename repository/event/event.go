@@ -44,3 +44,23 @@ func (er *EventRepository) GetEventById(id int) (_entities.Event, int, error) {
 	}
 	return event, int(tx.RowsAffected), nil
 }
+
+func (er *EventRepository) UpdateEvent(updateEvent _entities.Event) (_entities.Event, int, error) {
+	tx := er.database.Save(&updateEvent)
+	if tx.Error != nil {
+		return updateEvent, 0, tx.Error
+	}
+	return updateEvent, int(tx.RowsAffected), nil
+}
+
+func (er *EventRepository) DeleteEvent(id int) (int, error) {
+	var event _entities.Event
+	tx := er.database.Delete(&event, id)
+	if tx.Error != nil {
+		return 0, tx.Error
+	}
+	if tx.RowsAffected == 0 {
+		return 0, tx.Error
+	}
+	return int(tx.RowsAffected), nil
+}
