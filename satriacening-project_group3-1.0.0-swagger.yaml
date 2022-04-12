@@ -1,0 +1,261 @@
+openapi: 3.0.0
+info:
+  description: |
+    If you have any questions or requests please contact me at 
+    [telegram](https://t.me/satria_cening)
+  version: "1.0.0"
+  title: Event Planning App
+  contact:
+    email: satriacening@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/satriacening/project_group3/1.0.0
+  - url: 'https://petstore.swagger.io/v2'
+tags:
+  - name: Authentication
+    description: operation to login
+  - name: User
+    description: Operations about user
+  - name: Event
+    description: operation about event
+paths:
+  /login:
+    post:
+      tags:
+        - Authentication
+      summary: Login user
+      description: Used to access protected features
+      operationId: loginUSer
+      responses:
+        '200':
+          description: login success
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+        description: For login
+        required: false
+  /users:
+    post:
+      tags:
+        - User
+      summary: Create user
+      description: This can only be done by the logged in user.
+      operationId: createUser
+      responses:
+        default:
+          description: successful operation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        description: Created user object
+        required: true
+  /user/{id}:
+    get:
+      tags:
+        - User
+      summary: Get user by user id
+      operationId: getUserById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: uint
+            example: 1
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
+    put:
+      tags:
+        - User
+      summary: Updated user
+      description: This can only be done by the logged in user.
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: path
+          description: id that need to be updated
+          required: true
+          schema:
+            type: integer
+            format: uint
+            example: 1
+      responses:
+        '200':
+          description: Succes to update user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseUpdate'
+        '400':
+          description: Invalid id supplied
+        '404':
+          description: User not found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        description: Updated user object
+        required: true
+    delete:
+      tags:
+        - User
+      summary: Delete user
+      description: This can only be done by the logged in user.
+      operationId: deleteUser
+      parameters:
+        - name: id
+          in: path
+          description: The id that needs to be deleted
+          required: true
+          schema:
+            type: integer
+            format: uint
+      responses:
+        '400':
+          description: Invalid id supplied
+        '404':
+          description: User not found
+  /events:
+    post:
+      tags:
+        - Event
+      summary: operation for add event
+      operationid: createEvent
+      response:
+        '200':
+          description: Create event succses 
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Event'
+        description: Created user object
+        required: false
+    get:
+      tags:
+        - Event
+      summary: operation for get all event
+      operationid: getAllEvents
+      response:
+        '200':
+          description: get all events succes
+      requestBody:
+        conten:
+          application/json:
+        required: false
+  /events/
+    
+externalDocs:
+  description: Find out more about Swagger
+  url: 'http://swagger.io'
+components:
+  schemas:
+    Login:
+      type: object
+      properties:
+        email: 
+          type: string
+          example: 'satriaganteng@gmail.com'
+        password:
+          type: string
+          example: 'satria123'
+    User:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Satria Ganteng
+        email:
+          type: string
+          example: satria@gmail.com
+        password:
+          type: string
+          example: satria123
+    SimpleUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: uint
+          example: 1
+        name:
+          type: string
+          example: Satria Ganteng
+        email:
+          type: string
+          example: satria@mail.com
+    Event:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Turnamen Mobile Legend :Bang-bang || tinggkat Desa Limbangan
+        hosted_by:
+          type: string
+          example: Satria Ganteng
+        date:
+          type: string(&date-time)
+        location:
+          type: string
+          example: Limbangan
+        detail:
+          type: string
+          example: ini adalah turnamen game online yang sangan di tunggu-tunggu
+    # ArrayOfEvent:
+    #   type: array
+    #   properties:
+    #     - object
+    ApiResponseUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          example: succes
+        message:
+          type: string
+          example: succes to update data
+  requestBodies:
+    UserArray:
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/User'
+      description: List of user object
+      required: true
+  securitySchemes:
+    petstore_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: 'http://petstore.swagger.io/oauth/dialog'
+          scopes:
+            'write:pets': modify pets in your account
+            'read:pets': read your pets
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
