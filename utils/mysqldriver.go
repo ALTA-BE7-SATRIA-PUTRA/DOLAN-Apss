@@ -32,8 +32,6 @@ func InitDB(config *configs.AppConfig) *gorm.DB {
 }
 
 func InitialMigration(db *gorm.DB) {
-
-	fmt.Println("ini jalan")
 	db.AutoMigrate(&entities.User{})
 	db.AutoMigrate(&entities.Catagory{})
 	db.AutoMigrate(&entities.Event{})
