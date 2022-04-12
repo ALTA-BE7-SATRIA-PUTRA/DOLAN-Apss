@@ -2,6 +2,7 @@ package catagory
 
 import (
 	"group-project/dolan-planner/delivery/helper"
+	"group-project/dolan-planner/entities"
 	_catagoryUseCase "group-project/dolan-planner/usecase/catagory"
 	"net/http"
 
@@ -15,6 +16,21 @@ type CatagoryHandler struct {
 func NewCatagoryHandler(c _catagoryUseCase.CatagoryUseCaseInterface) CatagoryHandler {
 	return CatagoryHandler{
 		catagoryUseCase: c,
+	}
+}
+
+func (uh *CatagoryHandler) CreateCatagoryHandler() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var newCatagory entities.Catagory
+		err := c.Bind(&newCatagory)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, helper.ResponseFailed(err.Error()))
+		}
+		_, error := uh.catagoryUseCase.CreateCatagory(newCatagory)
+		if error != nil {
+			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed(error.Error()))
+		}
+		return c.JSON(http.StatusOK, helper.ResponseSuccessWithoutData("success create catagory"))
 	}
 }
 
