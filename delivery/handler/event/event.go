@@ -58,6 +58,7 @@ func (eh *EventHandler) GetAllEventHandler() echo.HandlerFunc {
 				"date":       events[i].Date,
 				"hosted_by":  events[i].HostedBy,
 				"location":   events[i].Location,
+				"url_image":  events[i].UrlImage,
 			}
 			responseEvents = append(responseEvents, response)
 		}
