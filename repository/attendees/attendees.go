@@ -72,5 +72,9 @@ func (ar *AttendeesRepository) DeleteAttendees(idToken uint, idEvent uint) (uint
 	if tx.RowsAffected == 0 {
 		return 0, tx.Error
 	}
+
+	// mengurangi total participants karena ada user yang left
+	ar.database.Exec("UPDATE events SET total_participants = ? WHERE id = ?", gorm.Expr("total_participants - ?", 1), idEvent)
+
 	return uint(tx.RowsAffected), nil
 }
