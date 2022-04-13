@@ -60,7 +60,7 @@ func (ur *AttendeesRepository) PostAttendees(idEvent uint, idToken uint) (_entit
 
 func (ur *AttendeesRepository) GetAttendees(idEvent uint) ([]_entities.Attendees, error) {
 	var attendees []_entities.Attendees
-	tx := ur.database.Where("event_id = ?", idEvent).Find(&attendees)
+	tx := ur.database.Preload("User").Where("event_id = ?", idEvent).Find(&attendees)
 
 	if tx.RowsAffected == 0 {
 		return nil, errors.New("not found")
@@ -70,4 +70,20 @@ func (ur *AttendeesRepository) GetAttendees(idEvent uint) ([]_entities.Attendees
 		return nil, tx.Error
 	}
 	return attendees, nil
+}
+
+func (ar *AttendeesRepository) DeleteAttendees(idToken uint, idEvent uint) (uint, error) {
+	var attendees _entities.Attendees
+	tx := ar.database.Where("event_id = ?", idEvent).Where("user_id = ?", idToken).Unscoped().Delete(&attendees)
+	if tx.Error != nil {
+		return 0, tx.Error
+	}
+	if tx.RowsAffected == 0 {
+		return 0, tx.Error
+	}
+
+	// mengurangi total participants karena ada user yang left
+	ar.database.Exec("UPDATE events SET total_participants = ? WHERE id = ?", gorm.Expr("total_participants - ?", 1), idEvent)
+
+	return uint(tx.RowsAffected), nil
 }

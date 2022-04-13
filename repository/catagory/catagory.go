@@ -16,6 +16,14 @@ func NewCatagoryRepository(db *gorm.DB) *CatagoryRepository {
 	}
 }
 
+func (cr *CatagoryRepository) CreateCatagory(catagory _entities.Catagory) (_entities.Catagory, error) {
+	tx := cr.DB.Save(&catagory)
+	if tx.Error != nil {
+		return catagory, tx.Error
+	}
+	return catagory, nil
+}
+
 func (cr *CatagoryRepository) GetAllCatagory() ([]_entities.Catagory, error) {
 	var catagory []_entities.Catagory
 	tx := cr.DB.Find(&catagory)

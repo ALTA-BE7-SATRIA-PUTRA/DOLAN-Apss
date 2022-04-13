@@ -78,6 +78,46 @@ func (uh *AttendeesHandler) GetAttendeesHandler() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed(errString))
 		}
 
-		return c.JSON(http.StatusOK, helper.ResponseSuccess("succses to get attendees", attendees))
+		responseAttendees := []map[string]interface{}{}
+		for i := 0; i < len(attendees); i++ {
+			response := map[string]interface{}{
+				"id":       attendees[i].ID,
+				"event_id": attendees[i].EventId,
+				"user_id":  attendees[i].UserId,
+				"user": map[string]interface{}{
+					"name":      attendees[i].User.Name,
+					"url_image": attendees[i].User.UrlImage},
+			}
+			responseAttendees = append(responseAttendees, response)
+		}
+
+		return c.JSON(http.StatusOK, helper.ResponseSuccess("succses to get attendees", responseAttendees))
+	}
+}
+
+func (ah *AttendeesHandler) DeleteAttendeesHandler() echo.HandlerFunc {
+	return func(c echo.Context) error {
+
+		//mendapatkan id dari token yang dimasukkan
+		idToken, errToken := _middlewares.ExtractToken(c)
+		if errToken != nil {
+			return c.JSON(http.StatusUnauthorized, helper.ResponseFailed("unauthorized"))
+		}
+
+		idStr := c.Param("id")
+		idEvent, err := strconv.Atoi(idStr)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("id not recognise"))
+		}
+
+		//jika id sama dan tidak ada error
+		rows, err := ah.attendeesUseCase.DeleteAttendees(uint(idToken), uint(idEvent))
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed(err.Error()))
+		}
+		if rows == 0 {
+			return c.JSON(http.StatusBadRequest, helper.ResponseFailed("data not found"))
+		}
+		return c.JSON(http.StatusOK, helper.ResponseSuccessWithoutData("successfully left the event"))
 	}
 }

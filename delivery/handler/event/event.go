@@ -45,7 +45,16 @@ func (eh *EventHandler) CreateEventHandler() echo.HandlerFunc {
 
 func (eh *EventHandler) GetAllEventHandler() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		events, err := eh.eventUseCase.GetAllEvent()
+
+		filters := map[string]string{}
+		if c.QueryParam("name_event") != "" {
+			filters["name_event"] = c.QueryParam("name_event")
+		}
+		if c.QueryParam("location") != "" {
+			filters["location"] = c.QueryParam("location")
+		}
+
+		events, err := eh.eventUseCase.GetAllEvent(filters)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to fetch data"))
 		}
@@ -58,6 +67,7 @@ func (eh *EventHandler) GetAllEventHandler() echo.HandlerFunc {
 				"date":       events[i].Date,
 				"hosted_by":  events[i].HostedBy,
 				"location":   events[i].Location,
+				"url_image":  events[i].UrlImage,
 			}
 			responseEvents = append(responseEvents, response)
 		}
