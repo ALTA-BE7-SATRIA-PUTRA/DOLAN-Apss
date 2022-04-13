@@ -22,4 +22,4 @@ jobs:
           docker stop group_project3_cont
           docker rm group_project3_cont
           docker build -t image_group_project3:latest .
-          docker run -d -p 80:8080 -e APP_PORT="8080" -e DB_PORT="3306" -e DB_DRIVER="mysql" -e DB_NAME="group_project3" -e DB_ADDRESS="${{ secrets.DBHOST }}" -e DB_USERNAME="${{ secrets.DBUSERNAME }}" -e DB_PASSWORD="${{ secrets.DBPASSWORD }}" --name group_project3_cont image_group_project3:latest
+          docker run -d -p 8080:8080 -e APP_PORT="8080" -e DB_PORT="3306" -e DB_DRIVER="mysql" -e DB_NAME="group_project3" -e DB_ADDRESS="${{ secrets.DBHOST }}" -e DB_USERNAME="${{ secrets.DBUSERNAME }}" -e DB_PASSWORD="${{ secrets.DBPASSWORD }}" --name group_project3_cont image_group_project3:latest
