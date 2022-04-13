@@ -62,3 +62,15 @@ func (ur *AttendeesRepository) GetAttendees(idEvent uint) ([]_entities.Attendees
 	}
 	return attendees, nil
 }
+
+func (ar *AttendeesRepository) DeleteAttendees(idToken uint, idEvent uint) (uint, error) {
+	var attendees _entities.Attendees
+	tx := ar.database.Where("event_id = ?", idEvent).Where("user_id = ?", idToken).Unscoped().Delete(&attendees)
+	if tx.Error != nil {
+		return 0, tx.Error
+	}
+	if tx.RowsAffected == 0 {
+		return 0, tx.Error
+	}
+	return uint(tx.RowsAffected), nil
+}

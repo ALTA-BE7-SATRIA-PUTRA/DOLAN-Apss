@@ -25,6 +25,7 @@ func RegisterUserPath(e *echo.Echo, uh *_userHandler.UserHandler) {
 func RegisterAttendeesPath(e *echo.Echo, ah *_attendeesHandler.AttendeesHandler) {
 	e.POST("/attendees/:id", ah.PostAttendeesHandler(), _middlewares.JWTMiddleware())
 	e.GET("/attendees/:id", ah.GetAttendeesHandler(), _middlewares.JWTMiddleware())
+	e.DELETE("/attendees/:id", ah.DeleteAttendeesHandler(), _middlewares.JWTMiddleware())
 
 }
 func RegisterEventPath(e *echo.Echo, eh *_eventHandler.EventHandler) {
