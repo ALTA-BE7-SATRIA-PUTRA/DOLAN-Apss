@@ -1,6 +1,7 @@
 package attendees
 
 import (
+	"errors"
 	"fmt"
 	_entities "group-project/dolan-planner/entities"
 
@@ -22,6 +23,10 @@ func (ur *AttendeesRepository) PostAttendees(idEvent uint, idToken uint) (_entit
 	var event _entities.Event
 
 	txEvent := ur.database.Where("id = ?", idEvent).Find(&event)
+
+	if txEvent.RowsAffected == 0 {
+		return _entities.Attendees{}, 6, fmt.Errorf("not found")
+	}
 
 	if txEvent.Error != nil {
 		return _entities.Attendees{}, 1, fmt.Errorf("fail to read event")
@@ -56,6 +61,10 @@ func (ur *AttendeesRepository) PostAttendees(idEvent uint, idToken uint) (_entit
 func (ur *AttendeesRepository) GetAttendees(idEvent uint) ([]_entities.Attendees, error) {
 	var attendees []_entities.Attendees
 	tx := ur.database.Preload("User").Where("event_id = ?", idEvent).Find(&attendees)
+
+	if tx.RowsAffected == 0 {
+		return nil, errors.New("not found")
+	}
 
 	if tx.Error != nil {
 		return nil, tx.Error

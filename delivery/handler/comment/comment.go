@@ -40,17 +40,22 @@ func (uh *CommentHandler) PostCommentHandler() echo.HandlerFunc {
 		}
 
 		if newComment.Comment == "" {
-			return c.JSON(http.StatusBadRequest, helper.ResponseFailed("you haven't written a message yet"))
+			return c.JSON(http.StatusBadRequest, helper.ResponseFailed("you haven't written a message yet or bad format"))
 		}
 
 		_, idErr, _ := uh.commentUseCase.PostComment(newComment, uint(idEvent), uint(idToken))
 		if idErr == 1 {
-			c.JSON(http.StatusInternalServerError, helper.ResponseFailed("need join to event"))
+			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("need join to event"))
 		}
 
 		if idErr == 2 {
-			c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to post comment"))
+			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to post comment"))
 		}
+
+		if idErr == 3 {
+			return c.JSON(http.StatusBadRequest, helper.ResponseFailed("event not found"))
+		}
+
 		return c.JSON(http.StatusOK, helper.ResponseSuccessWithoutData("succses to post comment"))
 
 	}
@@ -70,6 +75,12 @@ func (uh *CommentHandler) GetCommentHandler() echo.HandlerFunc {
 		}
 
 		comment, err := uh.commentUseCase.GetComment(uint(idEvent))
+		errString := err.Error()
+
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, helper.ResponseFailed(errString))
+		}
+
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("fail to get comment"))
 		}

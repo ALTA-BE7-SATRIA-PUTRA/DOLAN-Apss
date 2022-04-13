@@ -1,6 +1,7 @@
 package comment
 
 import (
+	"errors"
 	"fmt"
 	_entities "group-project/dolan-planner/entities"
 
@@ -19,9 +20,16 @@ func NewCommentRepository(db *gorm.DB) *CommentRepository {
 
 func (ur *CommentRepository) PostComment(comment _entities.Comment, idEvent uint, idToken uint) (_entities.Comment, int, error) {
 	var attendeesdb _entities.Attendees
+	var event _entities.Event
 
 	comment.UserId = idToken
 	comment.EventId = idEvent
+
+	txEvent := ur.database.Where("id = ?", idEvent).Find(&event)
+
+	if txEvent.RowsAffected == 0 {
+		return _entities.Comment{}, 3, fmt.Errorf("not found")
+	}
 
 	txAtt := ur.database.Where("event_id = ?", idEvent).Where("user_id = ?", idToken).Find(&attendeesdb)
 	if txAtt.RowsAffected == 0 {
@@ -37,8 +45,12 @@ func (ur *CommentRepository) PostComment(comment _entities.Comment, idEvent uint
 
 func (ur *CommentRepository) GetComment(idEvent uint) ([]_entities.Comment, error) {
 	var comment []_entities.Comment
-
+	
 	tx := ur.database.Preload("User").Where("event_id = ?", idEvent).Find(&comment)
+
+  if tx.RowsAffected == 0 {
+      return nil, errors.New("failed to get comment: event not found")
+    }
 
 	if tx.Error != nil {
 		return nil, tx.Error
