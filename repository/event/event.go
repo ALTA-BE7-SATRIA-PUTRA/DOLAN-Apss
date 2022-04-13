@@ -24,9 +24,14 @@ func (er *EventRepository) CreatEvent(newEvent _entities.Event) (_entities.Event
 	return newEvent, nil
 }
 
-func (er *EventRepository) GetAllEvent() ([]_entities.Event, error) {
+func (er *EventRepository) GetAllEvent(filters map[string]string) ([]_entities.Event, error) {
 	var events []_entities.Event
-	tx := er.database.Find(&events)
+	builder := er.database.Order("name_event ASC")
+	for key, value := range filters {
+		builder.Where(key+" LIKE ?", "%"+value+"%")
+	}
+
+	tx := builder.Find(&events)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
