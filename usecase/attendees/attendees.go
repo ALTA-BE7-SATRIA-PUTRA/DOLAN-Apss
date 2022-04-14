@@ -15,13 +15,13 @@ func NewAttendeesUseCase(attendeesRepo _attendeesRepository.AttendeesRepositoryI
 	}
 }
 
-func (auc *AttendeesUseCase) PostAttendees(idEvent uint, idToken uint) (_entities.Attendees, int, error) {
-	attendeess, idErr, err := auc.attendeesRepository.PostAttendees(idEvent, idToken)
-	return attendeess, idErr, err
-}
-func (auc *AttendeesUseCase) GetAttendees(idEvent uint) ([]_entities.Attendees, error) {
-	attendeess, err := auc.attendeesRepository.GetAttendees(idEvent)
+func (auc *AttendeesUseCase) PostAttendees(idEvent uint, idToken uint) (_entities.Attendees, error) {
+	attendeess, err := auc.attendeesRepository.PostAttendees(idEvent, idToken)
 	return attendeess, err
+}
+func (auc *AttendeesUseCase) GetAttendees(idEvent uint) ([]_entities.Attendees, int, error) {
+	attendeess, rows, err := auc.attendeesRepository.GetAttendees(idEvent)
+	return attendeess, rows, err
 }
 
 func (auc *AttendeesUseCase) DeleteAttendees(idToken uint, idEvent uint) (uint, error) {

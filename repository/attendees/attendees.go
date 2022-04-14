@@ -18,58 +18,56 @@ func NewAttendeesRepository(db *gorm.DB) *AttendeesRepository {
 	}
 }
 
-func (ur *AttendeesRepository) PostAttendees(idEvent uint, idToken uint) (_entities.Attendees, int, error) {
+func (ur *AttendeesRepository) PostAttendees(idEvent uint, idToken uint) (_entities.Attendees, error) {
 	var attendees _entities.Attendees
 	var event _entities.Event
 
 	txEvent := ur.database.Where("id = ?", idEvent).Find(&event)
-
 	if txEvent.RowsAffected == 0 {
-		return _entities.Attendees{}, 6, fmt.Errorf("not found")
+		return _entities.Attendees{}, fmt.Errorf("not found")
 	}
 
 	if txEvent.Error != nil {
-		return _entities.Attendees{}, 1, fmt.Errorf("fail to read event")
+		return _entities.Attendees{}, fmt.Errorf("fail to read event")
 	}
 
 	if event.TotalParticipants == event.MaxParticipants {
-		return _entities.Attendees{}, 2, fmt.Errorf("quota full")
+		return _entities.Attendees{}, fmt.Errorf("quota full")
 	}
 
 	var attendeesdb []_entities.Attendees
 	txAtt := ur.database.Where("event_id = ?", idEvent).Where("user_id = ?", idToken).Find(&attendeesdb)
-
-	if txAtt.RowsAffected > 0 {
-		return _entities.Attendees{}, 3, fmt.Errorf("you have join")
+	fmt.Println("row aff ", txAtt.RowsAffected)
+	if txAtt.RowsAffected == 1 {
+		return _entities.Attendees{}, fmt.Errorf("you have join")
 	}
 
 	if txAtt.Error != nil {
-		return _entities.Attendees{}, 4, fmt.Errorf("fail to read attendees")
+		return _entities.Attendees{}, fmt.Errorf("fail to read attendees")
 	}
 
 	attendees.UserId = idToken
 	attendees.EventId = idEvent
 	tx := ur.database.Save(&attendees)
 	ur.database.Exec("UPDATE events SET total_participants = ? WHERE id = ?", gorm.Expr("total_participants + ?", 1), idEvent)
-
 	if tx.Error != nil {
-		return attendees, 5, tx.Error
+		return attendees, tx.Error
 	}
-	return attendees, 0, nil
+
+	return attendees, nil
 }
 
-func (ur *AttendeesRepository) GetAttendees(idEvent uint) ([]_entities.Attendees, error) {
+func (ur *AttendeesRepository) GetAttendees(idEvent uint) ([]_entities.Attendees, int, error) {
 	var attendees []_entities.Attendees
 	tx := ur.database.Preload("User").Where("event_id = ?", idEvent).Find(&attendees)
 
-	if tx.RowsAffected == 0 {
-		return nil, errors.New("not found")
-	}
-
 	if tx.Error != nil {
-		return nil, tx.Error
+		return nil, 1, tx.Error
 	}
-	return attendees, nil
+	if tx.RowsAffected == 0 {
+		return nil, 0, errors.New("not found")
+	}
+	return attendees, 1, nil
 }
 
 func (ar *AttendeesRepository) DeleteAttendees(idToken uint, idEvent uint) (uint, error) {
