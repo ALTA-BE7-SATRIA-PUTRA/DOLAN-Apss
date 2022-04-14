@@ -5,7 +5,7 @@ import (
 )
 
 type AttendeesRepositoryInterface interface {
-	PostAttendees(idEvent uint, idToken uint) (_entities.Attendees, int, error)
-	GetAttendees(idEvent uint) ([]_entities.Attendees, error)
+	PostAttendees(idEvent uint, idToken uint) (_entities.Attendees, error)
+	GetAttendees(idEvent uint) ([]_entities.Attendees, int, error)
 	DeleteAttendees(idToken uint, idEvent uint) (uint, error)
 }

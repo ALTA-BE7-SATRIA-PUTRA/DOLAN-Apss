@@ -26,7 +26,7 @@ func (uh *AttendeesHandler) PostAttendeesHandler() echo.HandlerFunc {
 		idStr := c.Param("id")
 		idEvent, errorconv := strconv.Atoi(idStr)
 		if errorconv != nil {
-			return c.JSON(http.StatusBadRequest, "The expected param must be number id event")
+			return c.JSON(http.StatusBadRequest, helper.ResponseFailed("The expected param must be number type integer"))
 		}
 
 		idToken, errToken := _middlewares.ExtractToken(c)
@@ -34,24 +34,10 @@ func (uh *AttendeesHandler) PostAttendeesHandler() echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, helper.ResponseFailed("unauthorized"))
 		}
 
-		_, idErr, _ := uh.attendeesUseCase.PostAttendees(uint(idEvent), uint(idToken))
-		if idErr == 1 {
-			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("fail to read event"))
-		}
-
-		if idErr == 2 {
-			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("quota is full"))
-		}
-
-		if idErr == 3 {
-			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("you have joined"))
-		}
-
-		if idErr == 4 {
-			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("fail to read attendees"))
-		}
-		if idErr == 6 {
-			return c.JSON(http.StatusBadRequest, helper.ResponseFailed("event not found"))
+		_, err := uh.attendeesUseCase.PostAttendees(uint(idEvent), uint(idToken))
+		errString := err.Error()
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, helper.ResponseFailed(errString))
 		}
 
 		return c.JSON(http.StatusOK, helper.ResponseSuccessWithoutData("succses join to event"))
@@ -69,13 +55,16 @@ func (uh *AttendeesHandler) GetAttendeesHandler() echo.HandlerFunc {
 		idStr := c.Param("id")
 		idEvent, errorconv := strconv.Atoi(idStr)
 		if errorconv != nil {
-			return c.JSON(http.StatusBadRequest, "The expected param must be number id event")
+			return c.JSON(http.StatusBadRequest, helper.ResponseFailed("The expected param must be number type integer"))
 		}
 
-		attendees, err := uh.attendeesUseCase.GetAttendees(uint(idEvent))
-		errString := err.Error()
+		attendees, rows, err := uh.attendeesUseCase.GetAttendees(uint(idEvent))
+		if rows == 0 {
+			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("attendees not found"))
+		}
+
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed(errString))
+			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to get attendees"))
 		}
 
 		responseAttendees := []map[string]interface{}{}
@@ -107,7 +96,7 @@ func (ah *AttendeesHandler) DeleteAttendeesHandler() echo.HandlerFunc {
 		idStr := c.Param("id")
 		idEvent, err := strconv.Atoi(idStr)
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("id not recognise"))
+			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("The expected param must be number type integer"))
 		}
 
 		//jika id sama dan tidak ada error
