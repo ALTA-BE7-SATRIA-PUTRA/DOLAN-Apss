@@ -108,3 +108,8 @@ func (euc *EventUseCase) DeleteEvent(id int) (int, error) {
 	rows, err := euc.eventRepository.DeleteEvent(id)
 	return rows, err
 }
+
+func (euc *EventUseCase) GetEventByUserId(idToken uint) ([]_entities.Event, int, error) {
+	events, rows, err := euc.eventRepository.GetEventByUserId(idToken)
+	return events, rows, err
+}

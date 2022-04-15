@@ -69,3 +69,15 @@ func (er *EventRepository) DeleteEvent(id int) (int, error) {
 	}
 	return int(tx.RowsAffected), nil
 }
+
+func (er *EventRepository) GetEventByUserId(idToken uint) ([]_entities.Event, int, error) {
+	var events []_entities.Event
+	tx := er.database.Where("user_id = ?", idToken).Find(&events)
+	if tx.Error != nil {
+		return events, 0, tx.Error
+	}
+	if tx.RowsAffected == 0 {
+		return events, 0, nil
+	}
+	return events, int(tx.RowsAffected), nil
+}
