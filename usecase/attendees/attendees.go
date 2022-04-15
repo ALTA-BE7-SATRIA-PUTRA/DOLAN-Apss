@@ -28,3 +28,8 @@ func (auc *AttendeesUseCase) DeleteAttendees(idToken uint, idEvent uint) (uint, 
 	rows, err := auc.attendeesRepository.DeleteAttendees(idToken, idEvent)
 	return rows, err
 }
+
+func (auc *AttendeesUseCase) GetAttendeesUser(idToken uint) ([]_entities.Attendees, int, error) {
+	attendees, rows, err := auc.attendeesRepository.GetAttendeesUser(idToken)
+	return attendees, rows, err
+}

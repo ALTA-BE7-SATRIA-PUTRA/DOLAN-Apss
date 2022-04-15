@@ -110,3 +110,40 @@ func (ah *AttendeesHandler) DeleteAttendeesHandler() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, helper.ResponseSuccessWithoutData("successfully left the event"))
 	}
 }
+
+func (uh *AttendeesHandler) GetAttendeesUserHandler() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		//mendapatkan id dari token yang dimasukkan
+		idToken, errToken := _middlewares.ExtractToken(c)
+		if errToken != nil {
+			return c.JSON(http.StatusUnauthorized, helper.ResponseFailed("unauthorized"))
+		}
+
+		attendees, rows, err := uh.attendeesUseCase.GetAttendeesUser(uint(idToken))
+		if rows == 0 {
+			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("data not found"))
+		}
+
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed(err.Error()))
+		}
+
+		responseAttendees := []map[string]interface{}{}
+		for i := 0; i < len(attendees); i++ {
+			response := map[string]interface{}{
+				"id":       attendees[i].ID,
+				"event_id": attendees[i].EventId,
+				"user_id":  attendees[i].UserId,
+				"event": map[string]interface{}{
+					"name_event": attendees[i].Event.NameEvent,
+					"date":       attendees[i].Event.Date,
+					"hosted_by":  attendees[i].Event.HostedBy,
+					"location":   attendees[i].Event.Location,
+					"url_image":  attendees[i].Event.UrlImage},
+			}
+			responseAttendees = append(responseAttendees, response)
+		}
+
+		return c.JSON(http.StatusOK, helper.ResponseSuccess("succses to get attendees", responseAttendees))
+	}
+}

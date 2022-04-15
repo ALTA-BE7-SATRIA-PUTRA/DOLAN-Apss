@@ -85,3 +85,16 @@ func (ar *AttendeesRepository) DeleteAttendees(idToken uint, idEvent uint) (uint
 
 	return uint(tx.RowsAffected), nil
 }
+
+func (ur *AttendeesRepository) GetAttendeesUser(idToken uint) ([]_entities.Attendees, int, error) {
+	var attendees []_entities.Attendees
+	tx := ur.database.Preload("Event").Where("user_id = ?", idToken).Find(&attendees)
+
+	if tx.Error != nil {
+		return attendees, 0, tx.Error
+	}
+	if tx.RowsAffected == 0 {
+		return attendees, 0, nil
+	}
+	return attendees, int(tx.RowsAffected), nil
+}

@@ -241,3 +241,37 @@ func (eh *EventHandler) DeleteEventHandler() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, helper.ResponseSuccessWithoutData("success deleted event"))
 	}
 }
+
+func (eh *EventHandler) GetEventByUserIdHandler() echo.HandlerFunc {
+	return func(c echo.Context) error {
+
+		//mendapatkan id dari token yang dimasukkan
+		idToken, errToken := _middlewares.ExtractToken(c)
+		if errToken != nil {
+			return c.JSON(http.StatusUnauthorized, helper.ResponseFailed("unauthorized"))
+		}
+
+		events, rows, err := eh.eventUseCase.GetEventByUserId(uint(idToken))
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("failed to fetch data"))
+		}
+		if rows == 0 {
+			return c.JSON(http.StatusBadRequest, helper.ResponseFailed("data not found"))
+		}
+
+		responseEvents := []map[string]interface{}{}
+		for i := 0; i < len(events); i++ {
+			response := map[string]interface{}{
+				"id":         events[i].ID,
+				"name_event": events[i].NameEvent,
+				"date":       events[i].Date,
+				"hosted_by":  events[i].HostedBy,
+				"location":   events[i].Location,
+				"url_image":  events[i].UrlImage,
+			}
+			responseEvents = append(responseEvents, response)
+		}
+
+		return c.JSON(http.StatusOK, helper.ResponseSuccess("success get all events", responseEvents))
+	}
+}
