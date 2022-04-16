@@ -7,6 +7,7 @@ import (
 	_eventUseCase "group-project/dolan-planner/usecase/event"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -30,10 +31,24 @@ func (eh *EventHandler) CreateEventHandler() echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, helper.ResponseFailed("unauthorized"))
 		}
 
-		var newEvent entities.Event
-		err := c.Bind(&newEvent)
+		var request entities.EventRequestFormat
+		err := c.Bind(&request)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, helper.ResponseFailed(err.Error()))
+		}
+
+		//Parsing Date
+		layoutFormat := "2006-01-02T15:04:05Z0700"
+		dateFormat := request.Date + ":00+0700"
+		dateParse, _ := time.Parse(layoutFormat, dateFormat)
+
+		newEvent := entities.Event{
+			CatagoryId:      request.CatagoryId,
+			NameEvent:       request.NameEvent,
+			MaxParticipants: request.MaxParticipants,
+			Date:            dateParse,
+			Location:        request.Location,
+			DetailEvent:     request.DetailEvent,
 		}
 
 		//proses binding image
