@@ -19,6 +19,7 @@ jobs:
         script: |
           cd /root/home/group_project3
           git pull origin main
+          source .env
           docker stop group_project3_cont
           docker rm group_project3_cont
           docker build -t image_group_project3:latest .
