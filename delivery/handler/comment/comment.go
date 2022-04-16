@@ -75,10 +75,9 @@ func (uh *CommentHandler) GetCommentHandler() echo.HandlerFunc {
 		}
 
 		comment, err := uh.commentUseCase.GetComment(uint(idEvent))
-		errString := err.Error()
 
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.ResponseFailed(errString))
+			return c.JSON(http.StatusBadRequest, helper.ResponseFailed(err.Error()))
 		}
 
 		if err != nil {
