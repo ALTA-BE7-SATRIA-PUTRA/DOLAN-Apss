@@ -37,7 +37,6 @@ func (ur *AttendeesRepository) PostAttendees(idEvent uint, idToken uint) (_entit
 
 	var attendeesdb []_entities.Attendees
 	txAtt := ur.database.Where("event_id = ?", idEvent).Where("user_id = ?", idToken).Find(&attendeesdb)
-	fmt.Println("row aff ", txAtt.RowsAffected)
 	if txAtt.RowsAffected == 1 {
 		return _entities.Attendees{}, fmt.Errorf("you have join")
 	}

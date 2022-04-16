@@ -35,9 +35,8 @@ func (uh *AttendeesHandler) PostAttendeesHandler() echo.HandlerFunc {
 		}
 
 		_, err := uh.attendeesUseCase.PostAttendees(uint(idEvent), uint(idToken))
-		errString := err.Error()
 		if err != nil {
-			return c.JSON(http.StatusBadRequest, helper.ResponseFailed(errString))
+			return c.JSON(http.StatusBadRequest, helper.ResponseFailed(err.Error()))
 		}
 
 		return c.JSON(http.StatusOK, helper.ResponseSuccessWithoutData("succses join to event"))
