@@ -49,33 +49,8 @@ func (eh *EventHandler) CreateEventHandler() echo.HandlerFunc {
 			Date:            dateParse,
 			Location:        request.Location,
 			DetailEvent:     request.DetailEvent,
+			UrlImage:        request.UrlImage,
 		}
-
-		//proses binding image
-		fileData, fileInfo, err_binding_image := c.Request().FormFile("image")
-		if err_binding_image != nil {
-			return c.JSON(http.StatusBadRequest, helper.ResponseFailed(err_binding_image.Error()))
-		}
-		// check file extension
-		_, err_check_extension := helper.CheckFileExtension(fileInfo.Filename)
-		if err_check_extension != nil {
-			return c.JSON(http.StatusBadRequest, helper.ResponseFailed(err_check_extension.Error()))
-		}
-		// check file size
-		err_check_size := helper.CheckFileSize(fileInfo.Size)
-		if err_check_size != nil {
-			return c.JSON(http.StatusBadRequest, helper.ResponseFailed(err_check_size.Error()))
-		}
-		fileName := "event" + "_" + strconv.Itoa(idToken) + "_" + strconv.Itoa(int(newEvent.MaxParticipants))
-
-		// upload the photo
-		var err_upload_photo error
-		theUrl, err_upload_photo := helper.UploadImage("imageEvent", fileName, fileData)
-		if err_upload_photo != nil {
-			return c.JSON(http.StatusBadRequest, helper.ResponseFailed(err_upload_photo.Error()))
-		}
-
-		newEvent.UrlImage = theUrl
 
 		_, error := eh.eventUseCase.CreatEvent(newEvent, uint(idToken))
 		if error != nil {
