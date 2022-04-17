@@ -204,7 +204,6 @@ func (eh *EventHandler) UpdateEventHandler() echo.HandlerFunc {
 func (eh *EventHandler) DeleteEventHandler() echo.HandlerFunc {
 	return func(c echo.Context) error {
 
-		//mendapatkan id dari token yang dimasukkan
 		idToken, errToken := _middlewares.ExtractToken(c)
 		if errToken != nil {
 			return c.JSON(http.StatusUnauthorized, helper.ResponseFailed("unauthorized"))
@@ -212,15 +211,23 @@ func (eh *EventHandler) DeleteEventHandler() echo.HandlerFunc {
 
 		idStr := c.Param("id")
 		id, err := strconv.Atoi(idStr)
-		// check apakah id dari token sama dengan id dari parm
-		if idToken != id {
-			return c.JSON(http.StatusUnauthorized, helper.ResponseFailed("unauthorized"))
-		}
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("id not recognise"))
 		}
 
-		//jika id sama dan tidak ada error
+		event, rowsGetEvent, errGetEvent := eh.eventUseCase.GetEventById(id)
+
+		if errGetEvent != nil {
+			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed(err.Error()))
+		}
+		if rowsGetEvent == 0 {
+			return c.JSON(http.StatusBadRequest, helper.ResponseFailed("data not found"))
+		}
+
+		if idToken != int(event.UserId) {
+			return c.JSON(http.StatusUnauthorized, helper.ResponseFailed("unauthorized"))
+		}
+
 		rows, err := eh.eventUseCase.DeleteEvent(id)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed(err.Error()))
