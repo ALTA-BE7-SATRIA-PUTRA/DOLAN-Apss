@@ -1,7 +1,7 @@
 package user
 
 import (
-	"errors"
+	"fmt"
 	_entities "group-project/dolan-planner/entities"
 	"testing"
 
@@ -15,6 +15,34 @@ func TestCreateUser(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, "Usamah", data.Name)
 	})
+
+	t.Run("TestCreateUserErrorValidation1", func(t *testing.T) {
+		userUseCase := NewUserUseCase(mockUserRepository{})
+		data, err := userUseCase.CreatUser(_entities.User{Name: "Usamah", UrlImage: "usamah.com", Email: "usamah@gmail.com", Password: "usamah"})
+		assert.NotNil(t, err)
+		assert.Equal(t, "Usamah", data.Name)
+	})
+
+	t.Run("TestCreateUserErrorValidation2", func(t *testing.T) {
+		userUseCase := NewUserUseCase(mockUserRepository{})
+		data, err := userUseCase.CreatUser(_entities.User{City: "Bogor", UrlImage: "usamah.com", Email: "usamah@gmail.com", Password: "usamah"})
+		assert.NotNil(t, err)
+		assert.Equal(t, "", data.Name)
+	})
+
+	t.Run("TestCreateUserErrorValidation3", func(t *testing.T) {
+		userUseCase := NewUserUseCase(mockUserRepository{})
+		data, err := userUseCase.CreatUser(_entities.User{Name: "Usamah", City: "Bogor", UrlImage: "usamah.com", Password: "usamah"})
+		assert.NotNil(t, err)
+		assert.Equal(t, "Usamah", data.Name)
+	})
+
+	t.Run("TestCreateUserError", func(t *testing.T) {
+		userUseCase := NewUserUseCase(mockUserRepositoryError{})
+		data, err := userUseCase.CreatUser(_entities.User{Name: "Usamah", City: "Bogor", UrlImage: "usamah.com", Email: "usamah@gmail.com", Password: "usamah"})
+		assert.NotNil(t, err)
+		assert.Equal(t, _entities.User{}, data)
+	})
 }
 
 func TestGetUser(t *testing.T) {
@@ -25,6 +53,14 @@ func TestGetUser(t *testing.T) {
 		assert.Equal(t, "Usamah", data.Name)
 		assert.Equal(t, 1, rows)
 	})
+
+	t.Run("TestGetUserError", func(t *testing.T) {
+		userUseCase := NewUserUseCase(mockUserRepositoryError{})
+		data, rows, err := userUseCase.GetUser(1)
+		assert.NotNil(t, err)
+		assert.Equal(t, _entities.User{}, data)
+		assert.Equal(t, 0, rows)
+	})
 }
 
 func TestUpdateUser(t *testing.T) {
@@ -32,17 +68,32 @@ func TestUpdateUser(t *testing.T) {
 		userUseCase := NewUserUseCase(mockUserRepository{})
 		data, rows, err := userUseCase.UpdateUser((_entities.User{Name: "abdur"}), 1)
 		assert.Nil(t, err)
-		assert.Equal(t, "abdur", data.Name)
+		assert.Equal(t, "Usamah", data.Name)
 		assert.Equal(t, 1, rows)
+	})
+
+	t.Run("TestUpdateUserSuccess", func(t *testing.T) {
+		userUseCase := NewUserUseCase(mockUserRepositoryError{})
+		data, rows, err := userUseCase.UpdateUser((_entities.User{Name: "abdur"}), 1)
+		assert.NotNil(t, err)
+		assert.Equal(t, data, data)
+		assert.Equal(t, 0, rows)
 	})
 }
 
 func TestDeleteUser(t *testing.T) {
-	t.Run("TestDeleteUser", func(t *testing.T) {
+	t.Run("TestDeleteUserSuccess", func(t *testing.T) {
 		userUseCase := NewUserUseCase(mockUserRepository{})
 		rows, err := userUseCase.DeleteUser(1)
 		assert.Nil(t, err)
 		assert.Equal(t, 1, rows)
+	})
+
+	t.Run("TestDeleteUserSuccess", func(t *testing.T) {
+		userUseCase := NewUserUseCase(mockUserRepositoryError{})
+		rows, err := userUseCase.DeleteUser(1)
+		assert.NotNil(t, err)
+		assert.Equal(t, 0, rows)
 	})
 }
 
@@ -51,20 +102,6 @@ type mockUserRepository struct{}
 
 func (m mockUserRepository) CreatUser(createUser _entities.User) (_entities.User, error) {
 	user := _entities.User{Name: "Usamah", City: "Bogor", UrlImage: "usamah.com", Email: "usamah@gmail.com", Password: "usamah"}
-
-	if createUser.Name == "" {
-		return user, errors.New("name can't be empty")
-	}
-	if createUser.City == "" {
-		return user, errors.New("city can't be empty")
-	}
-	if createUser.Email == "" {
-		return user, errors.New("email can't be empty")
-	}
-	if createUser.Password == "" {
-		return user, errors.New("password can't be empty")
-	}
-
 	return user, nil
 }
 
@@ -74,28 +111,30 @@ func (m mockUserRepository) GetUser(idToken int) (_entities.User, int, error) {
 	}, 1, nil
 }
 
-func (m mockUserRepository) UpdateUser(userUpdate _entities.User, id int) (_entities.User, int, error) {
+func (m mockUserRepository) UpdateUser(userUpdate _entities.User) (_entities.User, int, error) {
 	user := _entities.User{Name: "Usamah", City: "Bogor", UrlImage: "usamah.com", Email: "usamah@gmail.com", Password: "usamah"}
-
-	if userUpdate.Name != "" {
-		user.Name = userUpdate.Name
-	}
-	if userUpdate.Email != "" {
-		user.Email = userUpdate.Email
-	}
-	if userUpdate.Password != "" {
-		user.Password = userUpdate.Password
-	}
-	if userUpdate.City != "" {
-		user.City = userUpdate.City
-	}
-	if userUpdate.UrlImage != "" {
-		user.UrlImage = userUpdate.UrlImage
-	}
-
 	return user, 1, nil
 }
 
 func (m mockUserRepository) DeleteUser(id int) (int, error) {
 	return 1, nil
+}
+
+// === mock error ===
+type mockUserRepositoryError struct{}
+
+func (m mockUserRepositoryError) CreatUser(user _entities.User) (_entities.User, error) {
+	return _entities.User{}, fmt.Errorf("error create user")
+}
+
+func (m mockUserRepositoryError) GetUser(idToken int) (_entities.User, int, error) {
+	return _entities.User{}, 0, fmt.Errorf("error get user")
+}
+
+func (m mockUserRepositoryError) UpdateUser(userUpdate _entities.User) (_entities.User, int, error) {
+	return _entities.User{Name: "usamah", City: "bogor", UrlImage: "usamah.com", Email: "usamah@gmail.com", Password: "usamah"}, 0, fmt.Errorf("error update user")
+}
+
+func (m mockUserRepositoryError) DeleteUser(id int) (int, error) {
+	return 0, fmt.Errorf("error delete user")
 }
