@@ -13,9 +13,7 @@ func TestPostAttendees(t *testing.T) {
 	t.Run("TestPostAttendeesSuccess", func(t *testing.T) {
 		attendeesUseCase := NewAttendeesUseCase(mockAttendeesRepository{})
 		attendees, err := attendeesUseCase.PostAttendees(1, 1)
-		assert.Equal(t, _entities.Attendees{
-			EventId: 1, UserId: 1,
-		}, attendees)
+		assert.Equal(t, uint(1), attendees.EventId)
 		assert.Nil(t, err)
 	})
 
@@ -26,48 +24,44 @@ func TestPostAttendees(t *testing.T) {
 	})
 }
 func TestGetAttendees(t *testing.T) {
-	t.Run("TestPostAttendeesSuccess", func(t *testing.T) {
+	t.Run("TesGetAttendeesSuccess", func(t *testing.T) {
 		attendeesUseCase := NewAttendeesUseCase(mockAttendeesRepository{})
 		attendees, rows, err := attendeesUseCase.GetAttendees(1)
-		assert.Equal(t, _entities.Attendees{
-			EventId: 1, UserId: 1,
-		}, attendees)
+		assert.Equal(t, uint(1), attendees[0].EventId)
 		assert.Equal(t, 1, rows)
 		assert.Nil(t, err)
 	})
 
-	t.Run("TestPostAttendeesError", func(t *testing.T) {
+	t.Run("TestGetAttendeesError", func(t *testing.T) {
 		attendeesUseCase := NewAttendeesUseCase(mockAttendeesRepositoryError{})
 		_, _, err := attendeesUseCase.GetAttendees(1)
 		assert.NotNil(t, err)
 	})
 }
 func TestDeleteAttendees(t *testing.T) {
-	t.Run("TestPostAttendeesSuccess", func(t *testing.T) {
+	t.Run("TestDeleteAttendeesSuccess", func(t *testing.T) {
 		attendeesUseCase := NewAttendeesUseCase(mockAttendeesRepository{})
 		rows, err := attendeesUseCase.DeleteAttendees(1, 1)
-		assert.Equal(t, 1, rows)
+		assert.Equal(t, uint(1), rows)
 		assert.Nil(t, err)
 	})
 
-	t.Run("TestPostAttendeesError", func(t *testing.T) {
+	t.Run("TestDeleteAttendeesError", func(t *testing.T) {
 		attendeesUseCase := NewAttendeesUseCase(mockAttendeesRepositoryError{})
 		_, err := attendeesUseCase.DeleteAttendees(1, 1)
 		assert.NotNil(t, err)
 	})
 }
 func TestGetAttendeesUser(t *testing.T) {
-	t.Run("TestPostAttendeesSuccess", func(t *testing.T) {
+	t.Run("TestGetAttendeesUserSuccess", func(t *testing.T) {
 		attendeesUseCase := NewAttendeesUseCase(mockAttendeesRepository{})
 		attendees, rows, err := attendeesUseCase.GetAttendeesUser(1)
-		assert.Equal(t, _entities.Attendees{
-			EventId: 1, UserId: 1,
-		}, attendees)
+		assert.Equal(t, uint(1), attendees[0].EventId)
 		assert.Equal(t, 1, rows)
 		assert.Nil(t, err)
 	})
 
-	t.Run("TestPostAttendeesError", func(t *testing.T) {
+	t.Run("TestGetAttendeesUserError", func(t *testing.T) {
 		attendeesUseCase := NewAttendeesUseCase(mockAttendeesRepositoryError{})
 		_, _, err := attendeesUseCase.GetAttendeesUser(1)
 		assert.NotNil(t, err)
