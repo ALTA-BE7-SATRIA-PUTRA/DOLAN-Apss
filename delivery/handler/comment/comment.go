@@ -25,8 +25,13 @@ func NewCommentHandler(commentUseCase _commentUseCase.CommentUseCaseInterface) *
 func (uh *CommentHandler) PostCommentHandler() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var newComment _entities.Comment
-
 		c.Bind(&newComment)
+
+		comment, errFil := helper.FilterComment(newComment.Comment)
+		if errFil != nil {
+			return c.JSON(http.StatusInternalServerError, helper.ResponseFailed("fail in filter comment"))
+		}
+		newComment.Comment = comment
 
 		idStr := c.Param("id")
 		idEvent, errorconv := strconv.Atoi(idStr)
