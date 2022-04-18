@@ -1,7 +1,6 @@
 package helper
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -13,5 +12,5 @@ func FilterComment(comment string) (string, error) {
 		newText = strings.ReplaceAll(newText, txt, strings.Repeat(replace, len(find[i])))
 	}
 
-	return newText, fmt.Errorf("error to filter this comment")
+	return newText, nil
 }
