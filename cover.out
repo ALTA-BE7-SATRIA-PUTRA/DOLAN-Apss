@@ -9,6 +9,9 @@ group-project/dolan-planner/usecase/comment/comment.go:18.127,22.2 2 1
 group-project/dolan-planner/usecase/comment/comment.go:23.82,26.2 2 1
 group-project/dolan-planner/usecase/auth/auth.go:11.92,15.2 1 1
 group-project/dolan-planner/usecase/auth/auth.go:17.78,20.2 2 1
+group-project/dolan-planner/usecase/catagory/catagory.go:12.112,16.2 1 1
+group-project/dolan-planner/usecase/catagory/catagory.go:18.101,21.2 2 1
+group-project/dolan-planner/usecase/catagory/catagory.go:23.76,26.2 2 1
 group-project/dolan-planner/usecase/event/event.go:15.147,20.2 1 1
 group-project/dolan-planner/usecase/event/event.go:22.102,28.23 3 1
 group-project/dolan-planner/usecase/event/event.go:31.2,35.30 3 1
